@@ -1,46 +1,55 @@
 ---
-title: "Literate Analysis with Ocean Water Samples"
-subtitle: "coreR Session 05 — Section 5.7 Practice"
-format:
-  html:
-    toc: true
-    toc-depth: 3
+title: "Literate Analysis: Ocean Water Samples"
+author: "Angie Kochkarova"
+format: html
 execute:
-  warning: false
-  message: false
+  echo: true
 ---
 
 # Introduction
 
-This Quarto document follows the **Section 5.7 practice exercise** from coreR *Session 05 (Literate Analysis with Quarto)*: building a simple **prose + code** analysis using real seawater chemistry data (`BGchem2008data.csv`).\
-Source: <https://learning.nceas.ucsb.edu/2024-10-coreR/session_05.html>
+This document represents a literate analysis practice using seawater chemistry data. The data examined is the nitrogen and phosphate concentrations in arctic oceans to explore how closely the samples match the Redfield ratio (16:1), which reflects nutrient balance in marine ecosystems.
 
 ## About the data
 
-The seawater chemistry dataset used here is `BGchem2008data.csv` (downloaded previously in the course).
+The dataset \*\*BGchem2008data.csv\*\* was obtained from the Arctic Data Center (https://arcticdata.io/metacat/d1/mn/v2/object/urn%3Auuid%3A35ad7624-b159-4e29-a700-0c0770419941).
 
--   Date downloaded: August 8, 2025
--   Download source: <https://arcticdata.io/metacat/d1/mn/v2/object/urn%3Auuid%3A35ad7624-b159-4e29-a700-0c0770419941>
-
-You will explore the nitrogen to phosphate ratio, which indicates the health of the ocean ecosystem. <https://beal-agulhas.earth.miami.edu/teaching/courses/lecture-five/index.html>
+The data was downloaded on August 8, 2025.
 
 ## Setup
 
-Best practice: put all `library()` calls in one chunk near the top so collaborators can see what packages are required.
+```{r}
+## Setup
+
+library(readr)
+library(here)
+```
 
 ```{r}
-library(here)
-library(readr)
+## Read in Data
+
+#| message: false
+#| warning: false
+
+bg_chem <- read_csv(here::here("data","raw", "BGchem2008data.csv"))
+```
+
+```{r}
+#| eval: false
+#| echo: false
+
+colnames(bg_chem)
+str(bg_chem)
+head(bg_chem)
+summary(bg_chem)
+unique(bg_chem$Date)
+
 ```
 
 # Read in the data
 
-Quarto runs R in the same way as a script: objects only exist after the chunks that create them have been run.
-
-Using `here()` is a convenient way to build paths relative to your project root (e.g., your `.qmd` might live in `scripts/` while data lives in `data/`).
-
 ```{r}
-bg_chem <- read_csv(here::here("data", "BGchem2008data.csv"))
+bg_chem <- read_csv(here::here("data","raw", "BGchem2008data.csv"))
 ```
 
 (Optional) Quick peek at the data:
@@ -59,13 +68,18 @@ As the “analysis”, we’ll calculate a few simple summary statistics and exa
 
 ## Calculate summary statistics
 
-Compute mean nutrient values (using `na.rm = TRUE` so missing values don’t break the calculation).
+We calculated the mean nitrate (NO3), nitrite (NO2), ammonium (NH4), and phosphate (P) concentrations using the mean() function.
 
 ```{r}
 nitrate <- mean(bg_chem$NO3, na.rm = TRUE)
 nitrite <- mean(bg_chem$NO2, na.rm = TRUE)
 amm     <- mean(bg_chem$NH4, na.rm = TRUE)
 phos    <- mean(bg_chem$P,   na.rm = TRUE)
+```
+
+```{r}
+colnames(bg_chem)
+
 ```
 
 ## Calculate mean Redfield ratio
@@ -75,9 +89,7 @@ ratio <- (nitrate + nitrite + amm) / phos
 ratio
 ```
 
-You can report results inline in Quarto like this:
-
-The Redfield ratio for this dataset is approximately: `r round(ratio)`
+The Redfield ratio for this dataset is approximately \``` r round(ratio, 2)` ``.
 
 ## Plot Redfield ratio measurements
 
@@ -95,12 +107,16 @@ plot(
 
 # Conclusion
 
+About the results:
+
+Observing that the Nitrogen (N) to Phosphorous (P) ratio is 6.22, this is much lower than RedField ratio of 16. From the generated scatterplot there shows a positive correlation between N and P, which is ideal. Though, what makes the ratio lower than the ideal RedField ratio is the amount of N present. This indicates that the arctic samples are relatively nitrogen-limited, and therefore will not be ideal for sustaining diverse life forms.
+
 In this mini-analysis, we:
 
--   Loaded packages in a dedicated setup chunk
--   Read in `BGchem2008data.csv` using a project-root-relative path (`here()`)
--   Calculated simple nutrient means
--   Computed a mean nitrogen:phosphate ratio
+-   Loaded packages in a dedicated setup chunk\
+-   Read in BGchem2008data.csv using a project-root-relative path (here())\
+-   Calculated simple nutrient means\
+-   Computed a mean nitrogen:phosphate ratio\
 -   Created a basic plot relating total nitrogen to phosphate
 
 This is the core idea of **literate analysis**: combine narrative and code in one document so the workflow is easier to understand and reproduce.
