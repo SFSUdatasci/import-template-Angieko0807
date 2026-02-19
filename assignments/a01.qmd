@@ -1,0 +1,101 @@
+---
+title: "Literate Analysis: Ocean Water Samples"
+author: "Angie Kochkarova"
+format: html
+execute:
+  echo: true
+---
+
+##Introduction
+
+This document represents a literate analysis practice using seawater chemistry data. The data examined is the nitrogen and phosphate concentrations in arctic oceans to explore how closely the samples match the Redfield ratio (16:1), which reflects nutrient balance in marine ecosystems.
+
+##About the data
+
+The dataset **BGchem2008data.csv** was obtained from the Arctic Data Center (https://arcticdata.io/metacat/d1/mn/v2/object/urn%3Auuid%3A35ad7624-b159-4e29-a700-0c0770419941). 
+
+The data was downloaded on August 8, 2025.
+
+##Setup
+
+```{r}
+library(readr)
+library(here)
+```
+
+```{r}
+## Read in Data
+
+#| message: false
+#| warning: false
+
+bg_chem <- read_csv(here::here("data","raw", "BGchem2008data.csv"))
+```
+```{r}
+#| eval: false
+#| echo: false
+
+colnames(bg_chem)
+str(bg_chem)
+head(bg_chem)
+summary(bg_chem)
+unique(bg_chem$Date)
+```
+
+```
+## Analysis
+
+We calculate the mean nitrate (NO3), nitrite (NO2), ammonium (NH4), 
+and phosphate (P) concentrations using the mean() function.
+
+```{r}
+```{r}
+nitrate <- mean(bg_chem$NO3, na.rm = TRUE)
+nitrite <- mean(bg_chem$NO2, na.rm = TRUE)
+amm     <- mean(bg_chem$NH4, na.rm = TRUE)
+phos    <- mean(bg_chem$P,   na.rm = TRUE)
+```
+
+#Ratio of Nitrogen vs Phosphorous  
+```{r}
+```{r}
+ratio <- (nitrate + nitrite + amm) / phos
+ratio
+```
+
+The Redfield ratio for this dataset is approximately `r round(ratio, 2)`.
+
+##Plot RedField Ratio
+
+```{r}
+#| echo: false
+
+plot(
+  bg_chem$P,
+  bg_chem$NO2 + bg_chem$NO3 + bg_chem$NH4,
+  xlab = "Phosphate (P)",
+  ylab = "Total Nitrogen (NO2 + NO3 + NH4)",
+  main = "Ocean Water Samples: Total Nitrogen vs Phosphate"
+)
+```
+
+##Conclusion
+
+About the results:
+
+Observing that the Nitrogen (N) to Phosphorous (P) ratio is 6.22, this is much lower than RedField ratio of 16. From the generated scatterplot there shows a positive correlation between N and P, which is ideal. Though, what makes the ratio lower than the ideal RedField ratio is the amount of N present. This indicates that the arctic samples are relatively nitrogen-limited, and therefore will not be ideal for sustaining diverse life forms.
+
+In this mini-analysis, we:
+
+Loaded packages in a dedicated setup chunk
+
+Read in BGchem2008data.csv using a project-root-relative path (here())
+
+Calculated simple nutrient means
+
+Computed a mean nitrogen:phosphate ratio
+
+Created a basic plot relating total nitrogen to phosphate
+
+
+
