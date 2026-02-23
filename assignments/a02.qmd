@@ -1,0 +1,18 @@
+---
+title: "Student Responses to MILLI Survey"
+Author: "Angie Kochkarova"
+format: html
+execute:
+  echo: true
+---
+
+## Introduction
+
+This data is a simplified portion of the data collected from students within Studio Chemistry here at SF State. This will be used for assignment a02 to help us understand how to tidy data in R studio. 
+
+## About the data
+
+Data **Data to USe for Chem 806 a02.xlsx** was downloaded 
+## Read in the data
+
+-   I put my data
