@@ -21,7 +21,7 @@ library(readr)
 
 ```{r}
 # Import dataset from online repository
-catch_original <- read_csv("https://knb.ecoinformatics.org/knb/d1/mn/v2/object/df35b.302.1")
+catch_original <-read_csv("https://knb.ecoinformatics.org/knb/d1/mn/v2/object/df35b.302.1")
 ```
 
 ## Data Sources
