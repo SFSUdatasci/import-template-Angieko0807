@@ -1,0 +1,55 @@
+---
+title: "Cleaning and Wrangling Data with Alaskan Salmon"
+author: "Angie Kochkarova"
+---
+
+# Introduction
+
+Alaska salmon fisheries are an important ecological and economic resource, both globally and locally. Salmon fishing supports commercial fishing industries, providing jobs in coastal communities, and management of fisheries play a key role in marine and freshwater ecosystems. Because salmon migrate across large geographic areas, the catch levels can change depending on environmental conditions, regional productivity, and management strategies.
+
+By analyzing differences in average salmon catch across management regions this will help researchers reveal patterns in regional productivity, the pressures of fishing on the ecosystem, and population counts. Through understanding these differences improvements can be made to resource management, sustainability planning, and long-term conservation of salmon populations.
+
+# Data
+
+```{r}
+# Load required packages
+library(dplyr)
+library(tidyr)
+library(readr)
+#| message: false
+```
+
+```{r}
+# Import dataset from online repository
+catch_original <-read_csv("https://knb.ecoinformatics.org/knb/d1/mn/v2/object/df35b.302.1")
+```
+
+## Data Sources
+
+Data were obtained from the KNB Data Repository: Alaska commercial salmon catches by management region (1886–1997). File used: df35b.302.1
+
+URL: https://knb.ecoinformatics.org/knb/d1/mn/v2/object/df35b.302.1
+
+Data downloaded March 2nd, 2026.
+
+# Analysis
+
+```{r}
+mean_region <- catch_original %>% # Start with original dataset
+  select(-All, -notesRegCode) %>% # Remove unnecessary columns
+  mutate(Chinook = if_else(Chinook == "I", "1", Chinook)) %>%  # Replace "I" with "1" in Chinook column
+  mutate(Chinook = as.numeric(Chinook)) %>% # Convert Chinook column to numeric values
+  pivot_longer(-c(Region, Year), # change data format form wide to long
+               names_to = "species",# Create new column for species names
+               values_to = "catch") %>% # Create new column for catch values
+  mutate(catch = catch * 1000) %>% # Convert catch values to full numbers
+  group_by(Region) %>%  # Group the data by region
+  summarize(mean_catch = mean(catch)) %>% # Calculate the mean catch per region
+  arrange(desc(mean_catch)) # Sort from highest to lowest mean catch
+
+head(mean_region)
+```
+
+## Discussion
+
+From the analysis, we can determine that the region of SSE has the highest mean of salmon catches in comparison to the other regions. After SSE, the next region with the highest production of salmon is BRB. The differences of salmon catch and production per region indicate that there are probable differences in migration style and how the fisheries are managed. 
