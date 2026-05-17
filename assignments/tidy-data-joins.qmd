@@ -1,0 +1,106 @@
+---
+title: "R Practice: Tidy Data and Joins"
+author: "Angie Kochkarova"
+---
+
+```{r}
+library(readr)
+library(dplyr)
+```
+
+```{r}
+library(here)
+library(lubridate) # for bonus question
+```
+
+## Quick question: Did you get a message after loading the libraries? What is it telling you? Talk to your neighbor about it or write a note in your qmd.
+
+### Yes, I got the message that the package 'lubridate' was attached, and that some objects within the base package were being masked. The objects masked were: date, intersect, setdiff, and union. The masked objects come from the "base" package, or what R already provides. Because both R and lubridate have these 4 functions/objects, yet lubridate was loaded in after R, the functions from lubridate are prioritized. Therefore the functions from lubridate become default in this session.
+
+## read in data
+
+```{r}
+bird_observations <- read_csv(here::here("data","raw","52_pp52_birds_1.csv"))
+
+surveys <- read_csv(here::here("data", "raw","52_pp52_surveys_1.csv"))
+
+sites <- read_csv(here::here("data","raw","52_pp52_sites_1.csv"))
+
+taxalist <- read_csv(here::here("data","raw","52_pp52_taxalist_1.csv"))
+```
+
+```{r}
+View(surveys)
+# returns dimensions of the dataframe by number of rows and number of cols
+dim(bird_observations)
+```
+
+```{r}
+# returns the top six rows of the dataframe
+head(bird_observations)
+```
+
+```{r}
+# returns all the columns and some info about the cols
+glimpse(bird_observations)
+```
+```{r}
+# similar to glimpse but returns some summary statistics about the cols
+summary(bird_observations)
+```
+```{r}
+# returns column names 
+names(bird_observations)
+```
+```{r}
+# returns unique values in a column. In this case we can see all the different bird species IDs
+unique(bird_observations$species_id)
+```
+
+```{r}
+birds_subset <- bird_observations %>% # create subset of codes for bird observations
+  filter(species_id %in% c("BHCO", "RWBL")) %>% # only want birds with species ID BHCO and RWBL
+  filter(site_id %in% c("LI-W", "NU-C")) # only want from sites LI-W and NU-C
+```
+
+```{r}
+# syntax using pipe
+birds_left <- birds_subset %>% 
+  left_join(y = sites, by = "site_id")
+# don't see x = birds_subset here because piping in birds_subset means it automatically assumes birds_subset as x.
+
+# syntax without pipe
+birds_left <- left_join(x = birds_subset, y = sites, by = "site_id")
+head(birds_left)
+```
+
+```{r}
+birds_full <- full_join(x = birds_subset, y = sites, by = "site_id")
+birds_inner <- inner_join(x = birds_subset, y = taxalist, by = "species_id" )
+head(birds_inner)
+```
+
+```{r}
+names(bird_observations)
+```
+
+```{r}
+bird_obs_subset <- bird_observations %>% 
+  full_join(y = taxalist, by = "species_id") %>% 
+  full_join(y = sites, by = "site_id") %>% 
+  full_join(y = surveys, by = c("site_id", "survey_id")) %>%  
+  select(survey_date, common_name, park_name, bird_count, observer)
+```
+
+```{r}
+unique(bird_obs_subset$observer)
+```
+```{r}
+bird_obs_subset <- bird_obs_subset %>% 
+  mutate(observer = if_else(condition = observer == "Josh Burns", 
+                            true = "J. Burns", 
+                            false = observer))
+
+unique(bird_obs_subset$observer)
+```
+

@@ -1,13 +1,11 @@
 ---
-title: "Literate Analysis with Ocean Water Samples"
-subtitle: "coreR Session 05 — Section 5.7 Practice"
-format:
-  html:
-    toc: true
-    toc-depth: 3
-execute:
-  warning: false
-  message: false
+title: "Literate Analysis with Ocean Water Samples" 
+subtitle: "coreR Session 05 — Section 5.7 Practice" 
+format: html: 
+toc: true 
+toc-depth: 3 
+execute: warning: 
+false message: false 
 ---
 
 # Introduction

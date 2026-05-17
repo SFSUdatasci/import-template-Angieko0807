@@ -1,0 +1,15 @@
+---
+title: "decision log"
+format: html
+---
+
+## A08: Working with Spatial Data in R
+
+### Decision 1: Use Alaska Albers EPSG 3338 for the spatial join
+
+I transformed both the Alaska region polygons and the population point data to EPSG 3338 before running st_join because spatial joins require both datasets to use the same coordinate reference system. Alaska Albers is appropriate for Alaska regional analysis because it preserves area better than latitude and longitude coordinates.
+
+### Decision 2: Use st_within instead of st_intersects
+
+I used st_within because the population data are city points and the Alaska regions are polygons. I wanted to identify which region each city falls inside. st_intersects could include points touching boundaries, but st_within is more precise for assigning each city to one region.
+EOF
