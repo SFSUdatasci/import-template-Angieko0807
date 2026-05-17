@@ -1,0 +1,67 @@
+---
+title: "Student Responses to MILLI Survey"
+Author: "Angie Kochkarova"
+Date: "February 23rd, 2026"
+format: html
+execute:
+  echo: true
+---
+
+## Introduction
+
+This data is a simplified portion of the data collected from students within Studio Chemistry here at SF State. This will be used for assignment a02 to help us understand how to tidy data in R studio.
+
+In this assignment, I examine whether the provided dataset is tidy.\
+A tidy dataset has:\
+1. Each variable in its own column\
+2. Each observation in its own row\
+3. Each value in its own cell
+
+## About the data
+
+-   Data **DatatoUseforChem806a02.xlsx** was downloaded from the main studio chemistry survey data and simplified for assignment a02.
+-   The data was downloaded on February 23rd, 2026
+
+## Read in the data
+
+-   View the data in the data file, under subfile **raw**.
+
+# Data
+
+```{r}
+#| label: Loading in the Data
+# Load packages
+library(readxl)
+library(tidyverse)
+library(here)
+
+# Import data
+Survey_MILLI <- readxl::read_xlsx(here::here("data", "raw", "DatatoUseforChem806a02.xlsx"))
+
+# View data
+head(Survey_MILLI)
+glimpse(Survey_MILLI)
+```
+
+```{r}
+#| label: Reading in the Data
+## Read in Data
+
+#| message: false
+#| warning: false
+
+Survey_MILLI <- readxl::read_xlsx(here::here("data", "raw", "DatatoUseforChem806a02.xlsx"))
+
+```
+
+## Analysis
+
+```{r}
+#| label: Analysis of Data
+colnames(Survey_MILLI)
+summary(Survey_MILLI)
+```
+
+## Conclusion
+
+From the output of R, it is clear that the dataset is not tidy. The column names are unclear and were automatically renamed by R (e.g., “…1”, “C/A+...5”), indicating that the original Excel file contains blank or duplicated headers. Additionally, the first rows of the dataset contain metadata such as question text rather than observations, which violates the tidy data principle that each row should represent one observation. The dataset is also in wide format, with multiple lab variables spread across columns (e.g., Chem Lab_1, Chem Lab_4, Chem Lab_12), suggesting that it would need to be pivoted longer to meet tidy data standards. There is no clear primary key visible, and no foreign key appears to be present.

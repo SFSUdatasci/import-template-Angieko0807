@@ -1,0 +1,119 @@
+---
+title: "a05 Assignment"
+author: "Angie Kochkarova"
+Date: 04-02-2026
+---
+
+## Introduction
+
+Through the MetaData collected from the Sacramento-San Joaquin Delta, we as researchers are able to gain a better understanding of how people interact with local ecological restoration areas. This work is important as it allows us to evaluate the impact humans make on these areas and use the resources provided by the area. In this analysis, we specifically explore visitation patterns across restoration locations in the Sacramento-San Joaquin Delta. Through the visualization the number and type of visitors through ggplot2, we can better understand human activity and impact within these areas.
+
+## Data
+
+```{r}
+library(readr)
+library(dplyr)
+library(tidyr)
+library(forcats) # makes working with factors easier
+library(ggplot2)
+library(leaflet) # interactive maps
+library(DT) # interactive tables
+library(scales) # scale functions for visualization
+library(janitor) # expedite cleaning and exploring data
+library(viridis) # colorblind friendly color palette
+```
+
+```{r}
+install.packages("leaflet")
+install.packages("DT")
+install.packages("janitor")
+install.packages("viridis")
+```
+
+```{r}
+delta_visits_raw <- read_csv(here::here("data", "raw","Socioecological_monitoring_data.csv"))
+```
+
+```{r}
+## Check out column names
+
+colnames(delta_visits_raw)
+
+## Peak at each column and class
+glimpse(delta_visits_raw)
+
+## From when to when
+range(delta_visits_raw$Date)
+
+## Which time of day?
+unique(delta_visits_raw$Time_of_Day)
+```
+
+```{r}
+# Clean column names to snake_case
+delta_visits <- delta_visits_raw %>%
+  clean_names()
+
+# Convert data from wide to long format
+visits_long <- delta_visits %>%
+  pivot_longer(
+    cols = c(sm_boat, med_boat, lrg_boat, bank_angler, scientist, cars),
+    names_to = "visitor_type",      # new column for visitor categories
+    values_to = "quantity"          # values stored here
+  ) %>%
+  rename(restore_loc = eco_restore_approximate_location) %>%  # rename column
+  select(-notes)   # remove unnecessary column
+```
+
+```{r}
+# Calculate total daily visits grouped by location, date, and visitor type
+daily_visits_loc <- visits_long %>%
+  group_by(restore_loc, date, visitor_type) %>%  # group data
+  summarise(daily_visits = sum(quantity), .groups = "drop")  # sum visits
+```
+
+###Plot of Data: Total Visits by Location and Visitor Type
+
+```{r}
+# Create a bar plot showing total visits by location and visitor type
+ggplot(data = daily_visits_loc,
+       aes(x = daily_visits, y = restore_loc, fill = visitor_type)) +  # map variables
+  geom_col() +  # create bar chart
+  scale_fill_viridis_d() +  # apply colorblind-friendly colors
+  labs(
+    x = "Number of Visits",
+    y = "Restoration Location",
+    fill = "Visitor Type",
+    title = "Total Visits by Location and Visitor Type",
+    subtitle = "Sacramento-San Joaquin Delta Monitoring Data"
+  ) +
+  theme_minimal()  # clean theme
+```
+
+### Interactive Map with Unique Locationa and Coordinates
+
+```{r}
+# Create dataset of unique locations with coordinates
+locations <- visits_long %>%
+  distinct(restore_loc, .keep_all = TRUE) %>%  # keep unique locations
+  select(restore_loc, latitude, longitude)     # select relevant columns
+
+# Create interactive map
+leaflet(locations) %>%
+  addTiles() %>%  # add base map
+  addMarkers(
+    lng = ~longitude,   # longitude for markers
+    lat = ~latitude,    # latitude for markers
+    popup = ~restore_loc  # label popup
+  )
+```
+
+## Discussion
+
+Two Visuals were created to interpret the Socioecological monitoring data from the Sacramento-San Joaquin Delta, a plot and an interactive map.
+
+The plot, specifically a bar plot, shows the variation in visitation across different restoration locations and highlights the different visitor types. Depending on the location, some areas receive higher traffic from boaters, while others show more activity from anglers or scientists. This shows that the type of visitation depends on the area and ecology of the area.
+
+As for the interactive map, it's a great visual to show the distance of these areas from each other, and gives the visual context as to which areas have been restored. These clusters of locations indicate how important those ecological areas are to the community and the protection/saftey of the local species.
+
+Together, these two visualizations are great way to monitor useage and visitation of these areas by the community, and provide useful information to scientists and parks and rec. rangers for future management and conservation efforts.

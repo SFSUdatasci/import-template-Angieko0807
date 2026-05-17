@@ -1,0 +1,104 @@
+---
+title: "Assignment 04: Data Wrangling with dplyr"
+author: "Angie Kochkarova"
+date: "2026-04-01"
+---
+
+## Introduction
+
+In this assignment, I use functions from the tidyverse to clean and analyze bird observation data. The goal for this assignment is to learn how to turn raw and messy datasets into a format that summarizes data by location and month. By doing this data organization in R, we, as observers, can look fo temporal patterns in bird activity across different park locations.
+
+## Data
+
+```{r}
+library(readr)
+library(dplyr)
+library(here)
+library(lubridate)
+
+bird_observations <- read_csv(here::here("data","raw","52_pp52_birds_1.csv"))
+surveys <- read_csv(here::here("data", "raw","52_pp52_surveys_1.csv"))
+sites <- read_csv(here::here("data","raw","52_pp52_sites_1.csv"))
+taxalist <- read_csv(here::here("data","raw","52_pp52_taxalist_1.csv"))
+```
+
+### Read in Data
+
+```{r}
+bird_observations <- read_csv(here::here("data","raw","52_pp52_birds_1.csv"))
+
+surveys <- read_csv(here::here("data", "raw","52_pp52_surveys_1.csv"))
+
+sites <- read_csv(here::here("data","raw","52_pp52_sites_1.csv"))
+
+taxalist <- read_csv(here::here("data","raw","52_pp52_taxalist_1.csv"))
+
+```
+
+The datasets were obtained from the Environmental Data Initiative (EDI) Data Portal. The datasets includes bird observations collected in urban parks in the Phoenix metropolitan area.
+
+For this assignment, the specific datasets used were: - Bird observations (counts of birds observed) - Surveys (survey dates and metadata) - Sites (park locations) - Taxalist (species names and classifications)
+
+These four datasets were combined into a single dataset to be analyized.
+
+## Analysis
+
+### Step 1: Join Datasets
+
+```{r}
+bird_obs_subset <- bird_observations %>% 
+  full_join(y = taxalist, by = "species_id") %>% 
+  full_join(y = sites, by = "site_id") %>% 
+  full_join(y = surveys, by = c("site_id", "survey_id")) %>%  
+  select(survey_date, common_name, park_name, bird_count, observer)
+```
+
+
+### Step 2: Clean observer names
+
+```{r}
+bird_obs_subset <- bird_obs_subset %>% 
+  mutate(observer = if_else(observer == "Josh Burns", 
+                            "J. Burns", 
+                            observer))
+```
+
+### Step 3: Create month variable
+
+```{r}
+bird_obs_subset <- bird_obs_subset %>%
+  mutate(
+    survey_month = factor(month(survey_date, label = TRUE))
+  )
+```
+
+### Step 4: Relocate Column 
+
+```{r}
+bird_obs_subset <- bird_obs_subset %>%
+  relocate(survey_month, .after = survey_date)
+```
+
+### Step 5: Filter Parks 
+
+```{r}
+bird_obs_subset <- bird_obs_subset %>%
+  filter(park_name %in% c("Lindo", "Orme", "Palomino", "Sonrisa"))
+```
+
+### Step 6: Summarize data
+
+```{r}
+bird_summary <- bird_obs_subset %>%
+  group_by(park_name, survey_month) %>%
+  summarize(
+    total_birds = sum(bird_count, na.rm = TRUE),
+    .groups = "drop"
+  )
+
+bird_summary
+```
+
+## Summary 
+
+Looking at the final data frame, the data is now organized by location, month, and the total amount of birds. This was the ideal outcome through tidying the raw data. This is informative as it allows use to view the migratory patterns of birds across time and location. To further improve the analysis of the dataset we could incorporate visualizations. 
