@@ -1,3 +1,14 @@
-The AT command has been deprecated. Please use schtasks.exe instead.
+project:
+  type: website
+  render:
+    - index.qmd
+    - assignments/intro-to-spatial-data.qmd
 
-The request is not supported.
+format:
+  html:
+    toc: true
+
+execute:
+  echo: true
+  warning: false
+  message: false
