@@ -1,0 +1,28 @@
+---
+title: "a03 Red Field Data"
+author: "Angie Kochkarova"
+format: html
+---
+
+# Introduction
+
+This document analyzes seawater chemistry data to examine nutrient ratios
+in Arctic Ocean samples.
+
+# About the Data
+
+The dataset was obtained from:
+
+https://example.com/BGchem2008data.csv  
+
+It was downloaded on February 9th 2026.
+
+# Setup
+
+```{r}
+# Load required packages
+library(readr)
+library(here)
+
+# Read the CSV file
+bg_chem <- read_csv(here("data/BGchem2008data.csv"))

@@ -1,6 +1,8 @@
 project:
-  type: default
-  output-dir: .
+  type: website
+  render:
+    - index.qmd
+    - assignments/intro-to-spatial-data.qmd
 
 format:
   html:
