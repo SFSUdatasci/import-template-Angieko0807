@@ -2,11 +2,10 @@
 .Rhistory
 .RData
 .Rproj.user
-
 # Quarto
 /.quarto/
 /_site/
-
 # OS
 .DS_Store
 Thumbs.db
+**/*.quarto_ipynb

@@ -1,0 +1,152 @@
+---
+title: "Week 6 Practice Cleaning and Wrangling Data"
+author: "Angie Kochkarova and Ella Chavez"
+---
+
+## Data Sources
+
+Data were obtained from the KNB Data Repository: Alaska commercial salmon catches by management region (1886–1997). File used: df35b.302.1
+
+Data downloaded March 2nd, 2026.
+
+```{r}
+library(tidyr)
+library(dplyr)
+library(readr)
+#| message: false
+```
+
+```{r}
+catch_original <- read_csv("https://knb.ecoinformatics.org/knb/d1/mn/v2/object/df35b.302.1")
+```
+
+## Data Exploration
+
+```{r}
+colnames(catch_original)
+head(catch_original)
+summary(catch_original)
+unique(catch_original$Region)
+View(catch_original)
+```
+
+## Clean and Reshape Data
+
+```{r}
+catch_long <- catch_original %>%
+  pivot_longer(
+    cols = Chinook:All,
+    names_to = "Species",
+    values_to = "Catch"
+  )
+```
+
+```{r}
+unique(catch_original$Chinook)
+```
+
+```{r}
+catch_original <- catch_original %>%
+  mutate(Chinook = as.numeric(Chinook))
+```
+
+```{r}
+catch_original %>%
+  filter(is.na(Chinook))
+```
+
+```{r}
+str(catch_original)
+```
+
+```{r}
+catch_long <- catch_original %>%
+  pivot_longer(
+    cols = Chinook:All,
+    names_to = "Species",
+    values_to = "Catch"
+  )
+```
+
+```{r}
+catch_long
+```
+
+```{r}
+catch_long %>%
+  group_by(Species) %>%
+  summarize(total_catch = sum(Catch, na.rm = TRUE))
+```
+
+```{r}
+catch_long %>%
+  group_by(Region) %>%
+  summarize(total_catch = sum(Catch, na.rm = TRUE))
+```
+
+```{r}
+catch_long %>%
+  group_by(Species) %>%
+  summarize(avg_catch = mean(Catch, na.rm = TRUE))
+```
+
+# Using the filter function
+
+```{r}
+sockeye_data <- catch_long %>%
+  filter(Species == "Sockeye")
+modern_data <- catch_long %>%
+  filter(Year > 1950)
+sse_data <- catch_long %>%
+  filter(Region == "SSE")
+```
+
+# Sorting with Arrange
+
+```{r}
+catch_long %>%
+  arrange(desc(Catch))
+```
+```{r}
+catch_long %>%
+  arrange(Year)
+```
+
+# Editing Columns
+
+```{r}
+#| label: adding a column with mutate
+catch_long <- catch_long %>%
+  mutate(Catch_thousands = Catch / 1000)
+```
+```{r}
+#| label: Renaming the column
+catch_long <- catch_long %>%
+  rename(
+    catch_amount = Catch,
+    salmon_species = Species
+  )
+```
+```{r}
+#| label: Creating a combined column
+catch_long <- catch_long %>%
+  unite("Region_Species", Region, salmon_species, sep = "_")
+```
+```{r}
+#| label: Splitting up the column
+catch_long <- catch_long %>%
+  separate(Region_Species, into = c("Region", "salmon_species"), sep = "_")
+```
+
+# Pivot Wider 
+```{r}
+#| label: Pivot Wider 
+catch_wide <- catch_long %>%
+  pivot_wider(
+    names_from = salmon_species,
+    values_from = catch_amount
+  )
+```
+
+
+
